@@ -28,14 +28,14 @@ def run(vids:list, headless=False, reel=None):
             inbox, email = mail_system.get_inbox()
             #inbox  = yogopy.YogoInbox('forfouchtenredouts1956@yopmail.com')
 
-            logger.info('Running program...('+str(times+1)+')')
+            logger.info(f'Running program...({str(times + 1)})')
             fetcher.register_step_1(email=email)
-            
+
             code=inbox.listen_for_verification_code()
             fetcher.register_step_2(code=code, yt_link=vids[times])
             logger.success("Finished browsing the web!")
             link = inbox.listen_for_clip_link()
-            logger.info("Link aquired! "+link)
+            logger.info(f"Link aquired! {link}")
 
             urls = fetcher.download_videos(url=link)
             time.sleep(3)
@@ -43,26 +43,25 @@ def run(vids:list, headless=False, reel=None):
             logger.info("Video upload started...")
             logger.warning("Upload proccess is not fully developed yet!")
 
-            if reel == None:
+            if reel is None:
                 reel = uploader.Reel(
                     FB_CREDENTIALS['client_id'],
                     FB_CREDENTIALS['client_secret'],
                     FB_CREDENTIALS['access_url'],
                     FB_CREDENTIALS['page_id']
                 )
-                
+
 
             for url in urls:
                 uploader.post_video(reel, url)
-                
-            logger.success("Task NO. "+str(times+1)+" finished!")
-            
+
+            logger.success(f"Task NO. {str(times + 1)} finished!")
+
             return urls
 
         except UnboundLocalError:
             logger.warning("Unable to identify exception.")
 
-        #make sure the browser closes
         except KeyboardInterrupt:
             try: 
                 logger.error("Interrupted")
@@ -78,12 +77,14 @@ def run(vids:list, headless=False, reel=None):
                 if "IP Blocked!" in str(e):
                     logger.warning("IP Blocked! Retrying...")
                 elif fetcher.wish != None:
-                    logger.warning("Main script ended work with exception. Class returned: "+fetcher.wish+"... retrying")
+                    logger.warning(
+                        f"Main script ended work with exception. Class returned: {fetcher.wish}... retrying"
+                    )
                 else:
-                    logger.exception("Main script ended work with exception: "+str(e))
+                    logger.exception(f"Main script ended work with exception: {str(e)}")
                     raise Exception("Something unexpected happened!")
             except Exception:
-                logger.exception("Main script ended work with exception: "+str(e))
+                logger.exception(f"Main script ended work with exception: {str(e)}")
                 raise Exception("Something unexpected happened!")
             
 def run_raw(url, headless=False):

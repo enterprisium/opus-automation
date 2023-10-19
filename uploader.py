@@ -44,42 +44,44 @@ class FacebookInit:
 
     def func_get_long_lived_access_token(self):
         self.code = get_fb_credential(self.access_url)
-        url = self.graph_url + 'oauth/access_token'
+        url = f'{self.graph_url}oauth/access_token'
         param = dict()
         param['grant_type'] = 'fb_exchange_token'
         param['client_id'] = self.client_id
         param['client_secret'] = self.client_secret
         param['fb_exchange_token'] = self.code
         response = requests.get(url = url,params=param)
-        logger.debug("func_get_long_lived_access_token:response "+str(response))
+        logger.debug(f"func_get_long_lived_access_token:response {str(response)}")
         response =response.json()
-        logger.debug("func_get_long_lived_access_token:response "+str(response))
+        logger.debug(f"func_get_long_lived_access_token:response {str(response)}")
         long_lived_access_tokken = response['access_token']
         self.long_lived_access_tokken = long_lived_access_tokken
         return long_lived_access_tokken
 
     def func_get_page_id(self, ):
         # GETS FB USER ID
-        _url = self.graph_url + 'me'
+        _url = f'{self.graph_url}me'
         param = dict()
         param['access_token'] = self.long_lived_access_tokken
         response = requests.get(url=_url, params=param)
-        logger.debug("func_get_page_id:response "+str(response))
+        logger.debug(f"func_get_page_id:response {str(response)}")
         response = response.json()
         user_id = response['id']
-        logger.debug("func_get_page_id:user_id "+str(user_id))
+        logger.debug(f"func_get_page_id:user_id {str(user_id)}")
 
         param['fields'] = 'id'
-        
-        response = requests.get(url='https://graph.facebook.com/' + user_id + "/accounts", params=param)
+
+        response = requests.get(
+            url=f'https://graph.facebook.com/{user_id}/accounts', params=param
+        )
 
         response = response.json()
-        
+
         return response['data'][0]['id']
     
     def _func_get_instagram_business_account(self, page_id):
         self.page_id = page_id
-        url = 'https://graph.facebook.com/' + page_id
+        url = f'https://graph.facebook.com/{page_id}'
         param = dict()
         param['fields'] = 'instagram_business_account'
         param['access_token'] = self.long_lived_access_tokken
@@ -90,7 +92,7 @@ class FacebookInit:
         try:
             instagram_account_id = response['instagram_business_account']['id']
         except Exception as e:
-            logger.error("Instagram account not linked or other error occured:"+str(e))
+            logger.error(f"Instagram account not linked or other error occured:{str(e)}")
             return {'error':'Instagram account not linked'}
         return instagram_account_id
         
@@ -130,7 +132,7 @@ class Reel:
         self.graph_url = fb.graph_url
     
     def reels_post_video(self, video_url='',caption=''):
-        logger.debug("reels_post_video:video_url "+str(video_url))
+        logger.debug(f"reels_post_video:video_url {str(video_url)}")
 
         param = dict()
         param['fields'] = 'username'
@@ -149,23 +151,19 @@ class Reel:
         response = requests.post(url, params=param)
         logger.info("Video sent to facebook servers!")
         response = response.json()
-        logger.debug("reels_post_video:response "+str(response))
+        logger.debug(f"reels_post_video:response {str(response)}")
         return response['id']
 
     def reels_status_of_upload(self, ig_container_id = ''):
         url = self.graph_url + ig_container_id
-        param = {}
-        param['access_token'] = self.access_token
-        param['fields'] = 'status_code'
+        param = {'access_token': self.access_token, 'fields': 'status_code'}
         response = requests.get(url,params=param)
         response = response.json()
         return response
     
     def reels_publish_id(self, id = ''):
         url = self.graph_url + self.instagram_account_id + '/media_publish'
-        param = {}
-        param['access_token'] = self.access_token
-        param['creation_id'] = id
+        param = {'access_token': self.access_token, 'creation_id': id}
         response = requests.post(url,params=param)
         response = response.json()
         return response

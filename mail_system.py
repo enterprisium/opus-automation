@@ -15,7 +15,7 @@ def get_inbox():
 
     inbox = yogopy.YogoInbox(inbox_username)
 
-    logger.debug('Email used: '+input_email)
+    logger.debug(f'Email used: {input_email}')
 
     return inbox, input_email
 

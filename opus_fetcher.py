@@ -30,7 +30,9 @@ def search_for_element_and_send_keys(browser ,by, selector, input_):
 
 class Fetcher:
     def __init__(self):
-        logger.debug("[OPUS_FETCHER.PY] running with the following settings: TIMEOUT="+str(TIMEOUT)+", PROXY_TYPE="+str(PROXY_TYPE)+", PAID_PROXY_BACKBONE="+str(PAID_PROXY_BACKBONE)+", DO_SLEEP="+str(DO_SLEEP))
+        logger.debug(
+            f"[OPUS_FETCHER.PY] running with the following settings: TIMEOUT={str(TIMEOUT)}, PROXY_TYPE={str(PROXY_TYPE)}, PAID_PROXY_BACKBONE={str(PAID_PROXY_BACKBONE)}, DO_SLEEP={str(DO_SLEEP)}"
+        )
         self.email = 'aspiringlycracknel2004@yopmail.com'
         self.wish = None
 
@@ -47,11 +49,11 @@ class Fetcher:
 
                 # setting up browser
                 self.opt = Options()
-                self.opt.add_argument("--proxy-server="+self.proxy)
+                self.opt.add_argument(f"--proxy-server={self.proxy}")
 
                 self.driver = chromedriver.Chrome(headless=headless, options=self.opt)
                 self.driver.get('https://clip.opus.pro/dashboard?utm_source=opus')
-                
+
                 # Detecting if ip had been blocked
                 try:
                     element = WebDriverWait(self.driver, 5, ignored_exceptions=resources.IGNORED_EXCEPTIONS).until(EC.presence_of_element_located((By.XPATH, '//button[text()="Have questions?"]')))
@@ -63,14 +65,15 @@ class Fetcher:
                     raise Exception("IP Blocked")
                 except TimeoutException:
                     pass
-                
+
 
                 frame = WebDriverWait(self.driver, TIMEOUT, ignored_exceptions=resources.IGNORED_EXCEPTIONS).until(EC.presence_of_element_located((By.ID, "app-iframe")))
                 self.driver.switch_to.frame(frame)
-                
+
                 break
             except TimeoutException:
-                logger.info("Bad proxy! Searching for new one...("+str(count)+")"); count+=1
+                logger.info(f"Bad proxy! Searching for new one...({str(count)})")
+                count+=1
                 self.driver.close()
                 time.sleep(1)
 
@@ -83,7 +86,7 @@ class Fetcher:
         search_for_element_and_click(self.driver, By.CSS_SELECTOR,'button.MuiButtonBase-root:nth-child(3)')
     
     def register_step_2(self, code, yt_link, lenght="30s~60s"):
-        if not lenght == "Auto" and not lenght == "<30s" and not lenght == "30s~60s" and not lenght == "60s~90s" and not lenght == "90s~3m":
+        if lenght not in ["Auto", "<30s", "30s~60s", "60s~90s", "90s~3m"]:
             raise Exception("Lenght attribute is not correct, allowed strings are: Auto, <30s, 30s~60s, 60s~90s, 90s~3m.")
 
         #Insert email code
@@ -109,18 +112,20 @@ class Fetcher:
             raise Exception("IP Blocked")
         except TimeoutException:
             pass"""
-        
+
         #Click on free trial acceptance button
         search_for_element_and_click(self.driver, By.XPATH, '//button[text()="Start clipping"]')
         #insert yt link
         time.sleep(5)
         search_for_element_and_send_keys(self.driver, By.ID, ':r5:', yt_link)
         #Select lenght
-        search_for_element_and_click(self.driver, By.XPATH, '//button[text()="'+lenght+'"]')
+        search_for_element_and_click(
+            self.driver, By.XPATH, f'//button[text()="{lenght}"]'
+        )
         #Click on submit button
         search_for_element_and_click(self.driver, By.XPATH, '//*[@id="__next"]/div/div/div/div/div/div/div[1]/div/div[1]/div/div/div[2]/button')
         time.sleep(10)
-        logger.info('Tracking url: '+self.driver.current_url)
+        logger.info(f'Tracking url: {self.driver.current_url}')
         self.driver.close()
     
     def download_videos(self, url, headless=False):
@@ -172,15 +177,18 @@ class Fetcher:
         link_list = []
         while True:
             try:
-                print(str(count))
-                element = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div/div/div[2]/div/div[2]/div['+str(count)+']/div[2]/div/div/div/div/div[2]/div[2]/a')
+                print(count)
+                element = self.driver.find_element(
+                    By.XPATH,
+                    f'/html/body/div[1]/div/div/div/div/div[2]/div/div[2]/div[{str(count)}]/div[2]/div/div/div/div/div[2]/div[2]/a',
+                )
                 link_list.append(element.get_attribute('href'))
                 page.send_keys(Keys.PAGE_DOWN)
                 if DO_SLEEP: time.sleep(2+(random.randint(0,200)/100))
             except NoSuchElementException:
                 break
             count += 1
-        
+
         """
         dir_ = './temp/'+str(random.randint(0,100000000))
         os.mkdir(dir_)

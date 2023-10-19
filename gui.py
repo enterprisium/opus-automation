@@ -109,12 +109,12 @@ def open_settings_popup():
             var = BooleanVar(value=False)
             if SETTER[i] == True:
                 var.set(True)
-            
+
             print(var.get())
             lab = Label(top, text=SETTER_NAMES[i])
             inpu = Checkbutton(top, bd = 7, onvalue=True, offvalue=False, variable=var)
-            
-            
+
+
             input_list.append(var)
         else:
             lab = Label(top, text=SETTER_NAMES[i])
@@ -122,11 +122,11 @@ def open_settings_popup():
             inpu.insert(0, SETTER[i])
             input_list.append(inpu)
 
-        CreateToolTip(inpu, SETTER_HINTS[i]+ " | "+str(SETTER_TYPES[i]))
+        CreateToolTip(inpu, f"{SETTER_HINTS[i]} | {str(SETTER_TYPES[i])}")
 
         pw.add(lab)
         pw.add(inpu)
-    
+
     def save():
         for i in range(len(SETTER)):
             if SETTER_TYPES[i] == bool:
@@ -139,7 +139,7 @@ def open_settings_popup():
                 SETTER[i] = str(input_list[i].get()).split(",")
         save_settings()
         top.destroy()
-        
+
     button = Button(top, text='Save', width=25, bg="grey", command=save)
     button.pack()
 
@@ -158,12 +158,15 @@ def open_auth_popup():
         lab = Label(top, text=fb_credential)
         inpu = Entry(top, bd = 5)
         inpu.insert(0, FB_CREDENTIALS[fb_credential])
-        CreateToolTip(inpu, fb_credential+" for more info visit https://developers.facebook.com/docs/instagram-api/getting-started")
+        CreateToolTip(
+            inpu,
+            f"{fb_credential} for more info visit https://developers.facebook.com/docs/instagram-api/getting-started",
+        )
 
         pw.add(lab)
         pw.add(inpu)
         input_list.append(inpu)
-    
+
     def save():
         count = 0
         for facebook_credential in FB_CREDENTIALS:
@@ -171,7 +174,7 @@ def open_auth_popup():
             count += 1
         save_settings()
         top.destroy()
-    
+
 
     button = Button(top, text='Save', width=25, bg="grey", command=save)
     button.pack()

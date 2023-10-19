@@ -60,10 +60,7 @@ def get_authenticated_service():
   return build(API_SERVICE_NAME, API_VERSION, credentials = credentials)
 
 def initialize_upload(youtube, options):
-  tags = None
-  if options.keywords:
-    tags = options.keywords.split(',')
-
+  tags = options.keywords.split(',') if options.keywords else None
   body=dict(
     snippet=dict(
       title=options.title,
@@ -108,9 +105,9 @@ def resumable_upload(request):
       status, response = request.next_chunk()
       if response is not None:
         if 'id' in response:
-          print('Video id "%s" was successfully uploaded.' % response['id'])
+          print(f"""Video id "{response['id']}" was successfully uploaded.""")
         else:
-          exit('The upload failed with an unexpected response: %s' % response)
+          exit(f'The upload failed with an unexpected response: {response}')
     except HttpError as e:
       if e.resp.status in RETRIABLE_STATUS_CODES:
         error = 'A retriable HTTP error %d occurred:\n%s' % (e.resp.status,
@@ -118,7 +115,7 @@ def resumable_upload(request):
       else:
         raise
     except RETRIABLE_EXCEPTIONS as e:
-      error = 'A retriable error occurred: %s' % e
+      error = f'A retriable error occurred: {e}'
 
     if error is not None:
       print(error)
